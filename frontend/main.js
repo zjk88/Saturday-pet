@@ -1,6 +1,10 @@
 import { trackRequest } from './monitor.js';
 import { fetchEventSource } from '@microsoft/fetch-event-source';
 
+// 留空时走同源代理，腾讯云静态托管可在构建时指定后端域名。
+const apiBase = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/+$/, '');
+const apiUrl = path => apiBase + path;
+
 const modes = {
   chat: ['宠物对话', '问小六一个养宠问题，也可以接着上一轮聊。'],
   rag: ['宠物知识库', '从本地宠物知识资料中检索答案。'],
@@ -101,7 +105,7 @@ $('form').onsubmit = async event => {
       body.append('message', message);
       body.append('chatId', chatId);
       body.append('image', file);
-      const response = await fetch('/api/pet/agent/run/image', {method: 'POST', body});
+      const response = await fetch(apiUrl('/api/pet/agent/run/image'), {method: 'POST', body});
       if (!response.ok) throw Error('图片任务失败（HTTP ' + response.status + '）');
       const result = await response.json();
       reply.textContent = result.steps.map(step =>
@@ -111,7 +115,7 @@ $('form').onsubmit = async event => {
     } else if (mode === 'chat' || mode === 'agent') {
       const path = mode === 'chat' ? 'chat/sse' : 'agent/run/sse';
       let output = '', completed = false;
-      await fetchEventSource('/api/pet/' + path + '?' + new URLSearchParams({message, chatId}), {
+      await fetchEventSource(apiUrl('/api/pet/' + path) + '?' + new URLSearchParams({message, chatId}), {
         openWhenHidden: true,
         async onopen(r) { if (!r.ok || !r.headers.get('content-type')?.includes('text/event-stream')) throw Error('接口未返回事件流（HTTP ' + r.status + '）'); },
         onmessage(e) {
@@ -142,7 +146,7 @@ $('form').onsubmit = async event => {
         options.headers = {'Content-Type':'application/json'};
         options.body = JSON.stringify({message, chatId});
       }
-      const response = await fetch('/api/pet/' + path, options);
+      const response = await fetch(apiUrl('/api/pet/' + path), options);
       const text = await response.text();
       if (!response.ok) {
         let reason;
