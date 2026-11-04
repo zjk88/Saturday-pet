@@ -1,0 +1,12 @@
+# Secrets are supplied by the deployment platform's environment variables.
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+knife4j:
+  enable: false
+server:
+  error:
+    include-message: never
+    include-stacktrace: never
