@@ -1,0 +1,18 @@
+# Copy to application-local.yml; fill values locally. Never commit real keys.
+spring:
+  ai:
+    openai:
+      api-key: ${AI_DASHSCOPE_API_KEY:not-configured}
+      base-url: ${AI_DASHSCOPE_BASE_URL:https://dashscope.aliyuncs.com/compatible-mode}
+app:
+  ai:
+    vision:
+      api-key: ${DEEPSEEK_API_KEY:}
+
+# Map MCP requires enabling the mcp profile.
+# Prefer setting AMAP_MAPS_API_KEY in the IDE environment variables.
+
+# Linux deployment: SPRING_PROFILES_ACTIVE=mcp, AMAP_MCP_COMMAND=npx.
+# Set AMAP_MAPS_API_KEY in the server environment when MCP is enabled.
+search-api:
+  api-key: ${SEARCH_API_KEY:}

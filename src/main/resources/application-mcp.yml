@@ -1,0 +1,18 @@
+# Enable with spring.profiles.active=mcp; secrets remain external.
+spring:
+  ai:
+    mcp:
+      client:
+        enabled: true
+        name: saturday-pet-maps
+        type: SYNC
+        request-timeout: 60s
+        stdio:
+          connections:
+            amap:
+              command: ${AMAP_MCP_COMMAND:npx.cmd}
+              args:
+                - -y
+                - '@amap/amap-maps-mcp-server'
+              env:
+                AMAP_MAPS_API_KEY: ${AMAP_MAPS_API_KEY}

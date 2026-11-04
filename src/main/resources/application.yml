@@ -1,0 +1,59 @@
+spring:
+  config:
+    import: optional:file:./config/application-local.yml
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 6MB
+  datasource:
+    url: jdbc:hsqldb:file:./data/chat-memory;shutdown=true
+    username: sa
+    password:
+  ai:
+    mcp:
+      client:
+        enabled: false
+    chat:
+      memory:
+        repository:
+          jdbc:
+            initialize-schema: always
+    openai:
+      api-key: ${AI_DASHSCOPE_API_KEY:not-configured}
+      base-url: ${AI_DASHSCOPE_BASE_URL:https://dashscope.aliyuncs.com/compatible-mode}
+      chat:
+        options:
+          model: qwen-plus
+      embedding:
+        enabled: false
+  application:
+    name: saturday-pet
+server:
+  port: 8123
+  servlet:
+    context-path: /api
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+  api-docs:
+    path: /v3/api-docs
+  group-configs:
+    - group: default
+      paths-to-match: '/**'
+      packages-to-scan: com.saturday.pet.controller
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn
+
+app:
+  ai:
+    vision:
+      api-key: ${DEEPSEEK_API_KEY:}
+      base-url: https://api.deepseek.com
+      model: ${DEEPSEEK_VISION_MODEL:deepseek-flash}
+
+search-api:
+  api-key: ${SEARCH_API_KEY:}

@@ -1,0 +1,17 @@
+.git
+.idea
+.tools
+config/application-local.yml
+config/application-local.yaml
+**/application-local.yml
+**/application-local.yaml
+.env
+.env.*
+data
+tmp
+**/*.log
+**/*.pem
+**/*.key
+**/*.jks
+**/*.p12
+frontend/node_modules
