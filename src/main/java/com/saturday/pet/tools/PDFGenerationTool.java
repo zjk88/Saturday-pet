@@ -6,6 +6,7 @@ import com.itextpdf.kernel.font.PdfFontFactory;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.Paragraph;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import org.springframework.ai.tool.annotation.Tool;
@@ -30,6 +31,11 @@ public class PDFGenerationTool {
             throw new IllegalArgumentException("需要 .pdf 文件名及非空内容，内容不超过十万字");
         }
         var path = files.resolve("pdf", fileName);
+        Files.write(path, renderPdf(content), StandardOpenOption.CREATE_NEW);
+        return "PDF saved: " + path;
+    }
+
+    public static byte[] renderPdf(String content) throws IOException {
         var font = PdfFontFactory.createFont("STSong-Light", "UniGB-UCS2-H");
         var supportedText = new StringBuilder();
         content.codePoints().forEach(codePoint -> {
@@ -47,7 +53,6 @@ public class PDFGenerationTool {
             document.setFont(font);
             document.add(new Paragraph(supportedText.toString()));
         }
-        Files.write(path, buffer.toByteArray(), StandardOpenOption.CREATE_NEW);
-        return "PDF saved: " + path;
+        return buffer.toByteArray();
     }
 }

@@ -3,6 +3,16 @@
 需要 JDK 21。在 IDEA 中打开根目录 pom.xml 并加载 Maven 项目，运行 SaturdayPetApplication。
 也可执行 `mvn spring-boot:run`。
 
+## 小六工作台
+
+启动后端后，在项目根目录执行 `npm --prefix frontend install` 和 `npm --prefix frontend run dev`，打开终端给出的地址（默认 `http://localhost:5173`）。
+工作台中的文字和图片使用同一个会话。可以附上 JPEG 或 PNG（最多 5 MB），请小六整理一周照料清单，再追问调整。草稿确认后会生成可下载的 PDF。
+文字和知识库使用百炼配置，图片使用独立的 DeepSeek 配置，附近医院使用高德 MCP。
+
+旧版会话以只读历史保存在当前浏览器。新会话的原图预览仅在当前页面保留，后端记忆保留最近 10 条消息及其中的图片摘要和草稿。PDF 与待确认草稿从草稿创建起保留两小时，后端重启后失效。
+
+## 接口调试
+
 - 接口文档：http://localhost:8123/api/doc.html
 - 健康检查：GET http://localhost:8123/api/health，返回 ok
 

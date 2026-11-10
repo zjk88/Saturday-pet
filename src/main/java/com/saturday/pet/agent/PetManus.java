@@ -5,10 +5,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.CancellationException;
 import java.util.function.Consumer;
 import java.util.function.BooleanSupplier;
+import java.util.function.Function;
 import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.ai.chat.memory.InMemoryChatMemoryRepository;
+import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.util.Assert;
@@ -23,6 +26,12 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class PetManus extends ToolCallAgent {
+    public record Draft(String title, String content) {}
+    public record Reference(String tool, String content) {}
+    public record WorkbenchResult(Result result, Draft draft, List<Reference> references) {}
+
+    private final ChatModel model;
+    private final ToolCallback[] workbenchTools;
     private final ChatMemoryRepository repository;
     // 固定数量的锁避免锁对象随会话数无限增长，串行化同一会话的读写。
     private final Object[] sessionLocks = java.util.stream.IntStream.range(0, 64)
@@ -61,6 +70,8 @@ public class PetManus extends ToolCallAgent {
 
     public PetManus(ChatModel model, ToolCallback[] tools, ChatMemoryRepository repository) {
         super(model, tools);
+        this.model = model;
+        this.workbenchTools = Arrays.stream(tools).filter(WorkbenchAgent::isReadOnlyTool).toArray(ToolCallback[]::new);
         this.repository = repository;
     }
 
@@ -69,15 +80,37 @@ public class PetManus extends ToolCallAgent {
     }
 
     public Result run(String message, String chatId, Consumer<Step> onStep, BooleanSupplier cancelled) {
+        return runRemembered("pet-agent:", message, chatId,
+                history -> runWithHistory(message, history, onStep, cancelled), Result::answer);
+    }
+
+    public WorkbenchResult runWorkbench(String message, String chatId, Consumer<Step> onStep,
+            BooleanSupplier cancelled) {
+        var workbench = new WorkbenchAgent(model, workbenchTools);
+        Result result = runRemembered("pet-workbench:", message, chatId,
+                history -> workbench.runWithHistory(message, history, onStep, cancelled),
+                outcome -> {
+                    if (cancelled.getAsBoolean()) {
+                        throw new CancellationException("客户端已断开");
+                    }
+                    Draft draft = workbench.draftFor(outcome);
+                    return draft == null ? outcome.answer()
+                            : outcome.answer() + "\n\n当前文档草稿：" + draft.title() + "\n" + draft.content();
+                });
+        return new WorkbenchResult(result, workbench.draftFor(result), workbench.references());
+    }
+
+    private Result runRemembered(String namespace, String message, String chatId,
+            Function<List<Message>, Result> execute, Function<Result, String> rememberedReply) {
         Assert.hasText(message, "message 不能为空");
         Assert.hasText(chatId, "chatId 不能为空");
-        String key = UUID.nameUUIDFromBytes(("pet-agent:" + chatId).getBytes(StandardCharsets.UTF_8)).toString();
+        String key = UUID.nameUUIDFromBytes((namespace + chatId).getBytes(StandardCharsets.UTF_8)).toString();
         synchronized (sessionLocks[Math.floorMod(key.hashCode(), sessionLocks.length)]) {
             var history = new ArrayList<>(repository.findByConversationId(key));
-            Result result = runWithHistory(message, history, onStep, cancelled);
+            Result result = execute.apply(history);
             // 仅提交完整的用户消息和最终答复，不保存不完整的工具调用链。
             history.add(new UserMessage(message));
-            history.add(new AssistantMessage(result.answer()));
+            history.add(new AssistantMessage(rememberedReply.apply(result)));
             repository.saveAll(key, List.copyOf(history.subList(Math.max(0, history.size() - 10), history.size())));
             return result;
         }

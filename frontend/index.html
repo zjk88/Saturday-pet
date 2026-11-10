@@ -1,20 +1,101 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Saturday Pet 小六宠物助手｜宠物知识、医院查询与智能任务</title>
-<meta name="description" content="Saturday Pet 小六宠物助手，提供宠物饲养与护理知识问答、图片理解、附近宠物医院查询和多步任务，帮助你整理养宠资料。">
-<meta name="theme-color" content="#214e42">
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,interactive-widget=resizes-content">
+<meta name="theme-color" content="#183d32">
+<title>Saturday Pet · 小六工作台</title>
+<meta name="description" content="和小六聊养宠问题、看图、查找附近宠物医院，并把照料计划整理成可下载的 PDF。">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:site_name" content="Saturday Pet">
-<meta property="og:title" content="Saturday Pet · 小六宠物助手">
-<meta property="og:description" content="宠物知识问答、图片理解、医院查询与多步智能任务。">
-<link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/style.css"></head><body><header>✦　Saturday Pet <small>宠物生活工作室</small></header><main><aside><b>工作台</b><nav aria-label="功能入口"></nav><label class="sessions" for="sessions">此入口的历史会话</label><select id="sessions"></select></aside><section><small>PET COMPANION</small><h1>小六宠物助手</h1><div id="session-id"></div><div id="notice" role="status"></div><p id="intro">了解宠物饲养与护理知识，查找附近宠物医院，整理你的养宠资料。</p><div id="history" role="log" aria-live="polite"></div><form><textarea required aria-label="输入你的问题" placeholder="和小六说说你的需求…"></textarea><input id="image" hidden type="file" accept="image/jpeg,image/png"><footer><button type="button" id="new-session">新会话</button><button id="send">发送 ↗</button></footer></form></section></main><footer class="site-footer">
-<p>© <span id="copyright-year">2026</span> Saturday Pet</p>
-<p>陪伴每一天的养宠生活 · AI 内容仅供参考，宠物诊疗请咨询兽医。</p>
-<details id="monitor"><summary>运行状态 · 本地监控</summary>
-<p id="network-status" role="status"></p>
-<p>仅在当前页面记录请求耗时、成功状态及错误类型。刷新后清空。</p>
-<output id="monitor-stats" aria-live="polite"></output>
-<ol id="monitor-events"></ol>
-</details></footer>
-<noscript><p>请启用 JavaScript 使用聊天、图片上传及医院查询功能。</p></noscript>
-<script type="module" src="/main.js"></script></body></html>
-
+<meta property="og:title" content="Saturday Pet · 小六工作台">
+<meta property="og:description" content="在一条对话里看图、查养宠资料、找附近医院和整理照料计划。">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<svg class="defs" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+ <symbol id="i-paw" viewBox="0 0 24 24"><ellipse cx="5.6" cy="10" rx="2.1" ry="2.6" transform="rotate(-24 5.6 10)"/><ellipse cx="10" cy="6.6" rx="2" ry="2.6"/><ellipse cx="15" cy="6.6" rx="2" ry="2.6"/><ellipse cx="19.5" cy="10" rx="2.1" ry="2.6" transform="rotate(24 19.5 10)"/><path d="M6.8 17.7c0-2.2 3.2-5.4 5.7-5.4s5.7 3.2 5.7 5.4c0 2.1-2 2.7-3.6 2l-1.2-.6a2.2 2.2 0 0 0-1.8 0l-1.2.6c-1.6.7-3.6.1-3.6-2Z"/></symbol>
+ <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+ <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 19 19 5M9 5h10v10"/></symbol>
+ <symbol id="i-chat" viewBox="0 0 24 24"><path d="M20 11.5a8 8 0 0 1-8 8H4l1.5-4A8 8 0 1 1 20 11.5Z"/><path d="M9 11.5h6"/></symbol>
+ <symbol id="i-side" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="2"/><path d="M14 5v14"/></symbol>
+ <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
+ <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+ <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8" cy="9" r="1.4"/><path d="m3 17 5-4 4 3 4-5 5 5"/></symbol>
+ <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+ <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v5h3"/></symbol>
+ <symbol id="i-list" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="16" rx="2"/><path d="M9 8h6m-6 4h6m-6 4h4"/></symbol>
+ <symbol id="i-pin" viewBox="0 0 24 24"><path d="M19 10c0 5-7 10-7 10S5 15 5 10a7 7 0 0 1 14 0Z"/><circle cx="12" cy="10" r="2"/></symbol>
+ <symbol id="i-clip" viewBox="0 0 24 24"><path d="m8 13 6-6a2.5 2.5 0 0 1 3.5 3.5l-8 8a4 4 0 0 1-5.6-5.6l8.2-8.2"/></symbol>
+ <symbol id="i-up" viewBox="0 0 24 24"><path d="M12 19V5m-6 6 6-6 6 6"/></symbol>
+ <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11m-4-4 4 4 4-4M5 17v3h14v-3"/></symbol>
+</svg>
+<div class="shell" id="shell">
+  <aside class="navrail" id="navrail" aria-label="会话导航">
+    <div class="brand"><div class="logo"><svg aria-hidden="true"><use href="#i-paw"/></svg></div><div><strong>Saturday Pet</strong><span>小六宠物助手</span></div></div>
+    <button type="button" class="button primary new" id="new"><svg aria-hidden="true"><use href="#i-plus"/></svg>新对话<svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
+    <div class="overline side-heading">最近对话</div>
+    <nav class="history" id="history" aria-label="最近对话"></nav>
+    <div class="rail-foot">
+      <details class="monitor">
+        <summary>运行状态</summary>
+        <p id="network-status"></p><output id="monitor-stats"></output><ol id="monitor-events"></ol>
+      </details>
+      <div class="profile"><div class="profile-icon" aria-hidden="true">六</div><div><strong>小六工作台</strong><span class="small">© <span id="copyright-year">2026</span> Saturday Pet</span></div></div>
+    </div>
+  </aside>
+  <main class="main" id="main">
+    <header class="top">
+      <div class="top-left">
+        <button class="iconbtn mobile-menu" type="button" id="menu" aria-label="打开会话导航" aria-controls="navrail" aria-expanded="false"><svg aria-hidden="true"><use href="#i-menu"/></svg></button>
+        <div><div class="overline">对话工作台</div><h1 id="title" tabindex="-1">新对话</h1></div>
+      </div>
+      <div class="top-right">
+        <span class="status-pill">小六助手</span>
+        <button class="iconbtn" type="button" id="context-toggle" aria-label="显示或隐藏任务详情" aria-controls="context" aria-expanded="true"><svg aria-hidden="true"><use href="#i-side"/></svg></button>
+      </div>
+    </header>
+    <section class="thread" id="thread" aria-label="对话内容" tabindex="0">
+      <div class="flow" id="flow"></div>
+    </section>
+    <footer class="composer">
+      <div class="compose-inner">
+        <div class="suggestions" id="suggestions" aria-label="可以继续问"></div>
+        <form id="composer">
+          <div class="box">
+            <div class="attached" id="attached" hidden><span id="file-name" class="small"></span><button type="button" class="iconbtn" id="remove-file" aria-label="移除待发送图片"><svg aria-hidden="true"><use href="#i-close"/></svg></button></div>
+            <textarea id="message" rows="1" maxlength="4000" aria-label="发给小六的消息" placeholder="和小六说说你的需求…"></textarea>
+            <div class="compose-bar">
+              <input id="image" type="file" accept="image/jpeg,image/png" hidden>
+              <button type="button" class="iconbtn" id="attach" aria-label="附上 JPEG 或 PNG 图片" title="附上图片"><svg aria-hidden="true"><use href="#i-clip"/></svg></button>
+              <span class="small">JPEG / PNG · 5 MB</span>
+              <button type="button" class="button stop" id="stop" hidden>停止</button>
+              <button type="submit" class="button primary send" id="send" aria-label="发送消息"><svg aria-hidden="true"><use href="#i-up"/></svg></button>
+            </div>
+          </div>
+          <p class="compose-error" id="notice" role="status" hidden></p>
+        </form>
+        <p class="hint">宠物诊疗请咨询兽医</p>
+      </div>
+    </footer>
+  </main>
+  <button type="button" class="scrim" id="scrim" aria-label="关闭侧栏" tabindex="-1"></button>
+  <aside class="context" id="context" aria-labelledby="context-title">
+    <header class="context-top">
+      <div><div class="overline">Workspace</div><h2 id="context-title">任务详情</h2></div>
+      <button class="iconbtn" id="context-close" type="button" aria-label="关闭任务详情"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+    </header>
+    <div class="context-body" id="context-body"></div>
+  </aside>
+</div>
+<dialog id="preview" aria-labelledby="preview-title">
+  <div class="dialog-top"><h2 id="preview-title">图片预览</h2><form method="dialog"><button type="submit" class="iconbtn" aria-label="关闭预览"><svg aria-hidden="true"><use href="#i-close"/></svg></button></form></div>
+  <img id="preview-image" alt="">
+</dialog>
+<div id="announcement" class="sr-only" role="status"></div>
+<noscript>请启用 JavaScript 使用小六工作台。</noscript>
+<script type="module" src="/main.js"></script>
+</body>
+</html>
