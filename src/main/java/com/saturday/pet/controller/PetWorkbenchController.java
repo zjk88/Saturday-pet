@@ -139,6 +139,7 @@ public class PetWorkbenchController {
                     case 400 -> "图片无法读取，或像素过大，请换一张图片";
                     case 413 -> "图片不能超过 5 MB";
                     case 415 -> "图片仅支持 JPEG 和 PNG";
+                    case 502 -> status.getReason();
                     case 503 -> "图片识别暂不可用，请稍后再试";
                     default -> "这次请求未完成，请稍后再试";
                 };
